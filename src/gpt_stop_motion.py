@@ -4,8 +4,6 @@
 from openai import OpenAI
 import base64
 
-gpt_client = OpenAI()
-
 def request_gpt_image(client: OpenAI, image_prompt: str) -> list[dict]:
     created_image_response = client.response.create(
         model = "gpt-4.1-mini",

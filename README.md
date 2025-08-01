@@ -14,6 +14,8 @@ This tool generates sequential images using an OpenAI GPT model and combines the
 
 - Python 3.8+
 - OpenAI API key
+- Poppler fpr pdf2image
+- Tesseract for pytesseract
 
 ## Installation
 

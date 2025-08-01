@@ -1,7 +1,9 @@
-"""This module provides a collection of methods for generating scene prompts from the text in a PDF.
+"""This module provides a collection of methods for generating stop motion video scene prompts
+from the text in a PDF that has scannable text.
 """
 
-import PyPDF2
+import pytesseract
+from pdf2image import convert_from_path
 from openai import OpenAI
 
 # Base prompt generated using Claude LLM
@@ -51,13 +53,13 @@ def create_stop_motion_prompt(story_text: str, fps: int = 12):
     """
     return prompt
 
-def extract_pdf_text_per_page_pypdf2(pdf_path: str) -> dict[int,str]:
+# Method from https://stackoverflow.com/questions/45480280/convert-scanned-pdf-to-text-python
+def extract_pdf_text_per_page_pytesseract(pdf_path: str) -> dict[int,str]:
     pdf_page_index_to_text = {}
-    with open(pdf_path, "rb") as file:
-        pdf_reader = PyPDF2.PdfReader(file)
-        pdf_pages = len(pdf_reader.pages)
-        for page_index in range(pdf_pages):
-            pdf_page_index_to_text[page_index] = pdf_reader.pages[page_index].extract_text()
+    pages = convert_from_path(pdf_path)
+    for page_index, image_blob in enumerate(pages):
+        page_text = pytesseract.image_to_string(image_blob, lang="eng")
+        pdf_page_index_to_text[page_index] = page_text
     return pdf_page_index_to_text
 
 def request_gpt_text_response(client: OpenAI, prompt: str) -> list[dict]:
@@ -67,14 +69,17 @@ def request_gpt_text_response(client: OpenAI, prompt: str) -> list[dict]:
     )
     return response
 
-def generate_video_scene_descriptions(client: OpenAI, pdf_path: str, fps: int = 12) -> dict[int, str]:
+def generate_video_scene_descriptions(client: OpenAI, pdf_path: str, excluded_pages: list[int], fps: int = 12) -> dict[int, str]:
     pdf_page_index_to_video_scene_description = {}
-    pdf_page_index_to_text = extract_pdf_text_per_page_pypdf2(pdf_path)
+    pdf_page_index_to_text = extract_pdf_text_per_page_pytesseract(pdf_path)
     for page_index, story_text in pdf_page_index_to_text.items():
-        stop_motion_prompt = create_stop_motion_prompt(stop_motion_prompt, fps)
+        if page_index in excluded_pages:
+            continue
+        stop_motion_prompt = create_stop_motion_prompt(story_text, fps)
         video_scene_description_response = request_gpt_text_response(client, stop_motion_prompt)
         video_scene_description = video_scene_description_response.output_text
         pdf_page_index_to_video_scene_description[page_index] = video_scene_description
+    return pdf_page_index_to_video_scene_description
 
 
     
