@@ -5,9 +5,10 @@ from the text in a PDF that has scannable text.
 import pytesseract
 from pdf2image import convert_from_path
 from openai import OpenAI
+from openai.types.responses import Response
 
 # Base prompt generated using Claude LLM
-def create_stop_motion_prompt(story_text: str, fps: int = 12): 
+def create_stop_motion_prompt(story_text: str, duration_in_seconds: int = 5, fps: int = 12) -> str: 
     prompt = f"""You are a creative director specializing in stop-motion animation for short story fiction. I will provide you with text from the short story, and you need to create a detailed concept for a 5-second stop-motion scene that captures the essence of that short story.
 
     Please provide your response in the following structured format:
@@ -24,13 +25,11 @@ def create_stop_motion_prompt(story_text: str, fps: int = 12):
     **SETTING DESCRIPTION:**
     [Detailed description of the environment, props, and background elements]
 
-    **5-SECOND ANIMATION BREAKDOWN:**
+    **{duration_in_seconds}-SECOND ANIMATION BREAKDOWN:**
     - Second 1: [What happens in frames 1-{fps}]
     - Second 2: [What happens in frames {fps+1}-{fps*2}]
-    - Second 3: [What happens in frames {fps*2+1}-{fps*3}] 
-    - Second 4: [What happens in frames {fps*3+1}-{fps*4}]
-    - Second 5: [What happens in frames {fps*4+1}-{fps*5}]
-    Total frames needed: {fps*5} frames
+    [Include an entry for each of the {duration_in_seconds} seconds]
+    Total frames needed: {fps*duration_in_seconds} frames
 
     **KEY POSES/MOMENTS:**
     [3-4 specific keyframe descriptions that would be most important to capture]
@@ -62,14 +61,15 @@ def extract_pdf_text_per_page_pytesseract(pdf_path: str) -> dict[int,str]:
         pdf_page_index_to_text[page_index] = page_text
     return pdf_page_index_to_text
 
-def request_gpt_text_response(client: OpenAI, prompt: str) -> list[dict]:
+def request_gpt_text_response(client: OpenAI, prompt: str) -> Response:
     response = client.responses.create(
         model = "gpt-4.1-mini",
         input = prompt
     )
     return response
 
-def generate_video_scene_descriptions(client: OpenAI, pdf_path: str, excluded_pages: list[int], fps: int = 12) -> dict[int, str]:
+def generate_video_scene_descriptions(client: OpenAI, pdf_path: str, excluded_pages: list[int],
+                                      duration_in_seconds: int, fps: int = 12) -> dict[int, str]:
     pdf_page_index_to_video_scene_description = {}
     pdf_page_index_to_text = extract_pdf_text_per_page_pytesseract(pdf_path)
     for page_index, story_text in pdf_page_index_to_text.items():
