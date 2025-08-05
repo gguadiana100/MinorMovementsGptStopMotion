@@ -42,7 +42,9 @@ def save_image_from_gpt_image_data(image_name: str, image_data: list[str]) -> No
 def get_stop_motion_frame_image_prompt(scene_description_prompt: str, duration_in_seconds: int,
                                        fps: int, current_frame: int) -> str:
     prompt = f"""Please generate a stop motion image for frame {current_frame} that is one of a sequence of images for a stop motion
-    video that is {duration_in_seconds} seconds long with {fps} frames per second. 
+    video that is {duration_in_seconds} seconds long with {fps} frames per second. The prompt below is the overall scene description.
+    When iterating on previous images, do not change the background so that there is continuity between frames. Only change the image
+    to show movement of objects or characters as directed by the following prompt.
 
     {scene_description_prompt}
     """
@@ -60,7 +62,7 @@ def request_stop_motion_gpt_images(client: OpenAI, scene_description_prompt: str
             image_response = request_gpt_image(client, image_prompt)
         else:
             image_response = request_iterated_gpt_image(client, image_prompt, latest_response_id)
-        latest_response_id = image_response.previous_response_id
+        latest_response_id = image_response.id
         image_responses.append(image_response)
     return image_responses
 

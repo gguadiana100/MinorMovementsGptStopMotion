@@ -24,7 +24,7 @@ def main():
                                                                              EXCLUDE_BOOK_PAGES,
                                                                              STOP_MOTION_DURATION_IN_SECONDS,
                                                                              STOP_MOTION_FPS)
-    for page_index, video_scene_descriptions in stop_motion_scene_descriptions.items:
+    for page_index, video_scene_descriptions in stop_motion_scene_descriptions.items():
         image_responses = gpt_stop_motion.request_stop_motion_gpt_images(openai_client, video_scene_descriptions,
                                                                          STOP_MOTION_DURATION_IN_SECONDS, STOP_MOTION_FPS)
         image_path = f"{IMAGE_PATH_PREFIX}_PAGE_{page_index}"

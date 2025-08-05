@@ -16,6 +16,9 @@ def create_stop_motion_prompt(story_text: str, duration_in_seconds: int = 5, fps
     **SCENE CONCEPT:**
     [Brief 1-2 sentence description of the key moment to animate]
 
+    **IMAGE SIZE:**
+    The image should be 512 x 512 pixels.
+
     **VISUAL STYLE:**
     [Art style, color palette, lighting mood - suitable for stop-motion]
 
