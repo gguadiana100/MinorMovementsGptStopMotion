@@ -1,10 +1,10 @@
-# Stop Motion Video Creator
+# Minor Movements Stop Motion Video Creator
 
-A Python tool that creates stop-motion videos from book scenes using OpenAI's image generation API.
+This is a Python project that creates stop-motion videos using OpenAI's image generation API. The implementation uses the Responses API with the models GPT-image-1 and GPT-4.1-mini. It creates stop motion video scene prompts using the page content from the book Minor Movements that is in a PDF format. Once all the images are generated, they are put together into an mp4 file.
 
 ## Status
 
-⚠️ **Under Development** - This project is currently being stubbed and developed.
+This project has been developed using functional testing and does not currently have unit tests or error handling.
 
 ## Overview
 
@@ -19,15 +19,15 @@ This tool generates sequential images using an OpenAI GPT model and combines the
 
 ## Installation
 
-TBD
+Create a virtual environment and install the pip libraries using requirements.txt
 
 ## Usage
 
-TBD
+python main.py
 
 ## Cost Estimates
 
-TBD
+It's about $0.20 per frame. For a 60 frames per story with 12 stories, it would be about $144. It's quite expensive!
 
 ## License
 
