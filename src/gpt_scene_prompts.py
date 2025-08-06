@@ -16,11 +16,8 @@ def create_stop_motion_prompt(story_text: str, duration_in_seconds: int = 5, fps
     **SCENE CONCEPT:**
     [Brief 1-2 sentence description of the key moment to animate]
 
-    **IMAGE SIZE:**
-    The image should be 512 x 512 pixels.
-
     **VISUAL STYLE:**
-    [Art style, color palette, lighting mood - suitable for stop-motion]
+    [Art style - clay animation, color palette, lighting mood - suitable for stop-motion, background - solid background]
 
     **CHARACTER DESCRIPTION:**
     [Detailed physical description of main character(s) for consistency across frames]
@@ -28,10 +25,13 @@ def create_stop_motion_prompt(story_text: str, duration_in_seconds: int = 5, fps
     **SETTING DESCRIPTION:**
     [Detailed description of the environment, props, and background elements]
 
-    **{duration_in_seconds}-SECOND ANIMATION BREAKDOWN:**
-    - Second 1: [What happens in frames 1-{fps}]
-    - Second 2: [What happens in frames {fps+1}-{fps*2}]
-    [Include an entry for each of the {duration_in_seconds} seconds]
+    **FRAME BY FRAME ANIMATION BREAKDOWN:**
+    - Frame 1: [What happens in frame 1]
+    - Frame 2: [What happens in frame 2]
+    - Frame N: [What happens in frame N]
+    [Include an entry for each of the {fps*duration_in_seconds} frames. Each frame should feature the main character(s).
+     Also, detail the exact changes that are needed to ensure image continuity and detailed movements. Do not batch entries.
+     There should be {fps*duration_in_seconds} entries.]
     Total frames needed: {fps*duration_in_seconds} frames
 
     **KEY POSES/MOMENTS:**
@@ -46,7 +46,7 @@ def create_stop_motion_prompt(story_text: str, duration_in_seconds: int = 5, fps
     Requirements:
     - Keep character designs simple but distinctive for stop-motion consistency
     - Focus on one clear, engaging action or moment
-    - Ensure the scene has a clear beginning, middle, and end within 5 seconds
+    - Ensure the scene has a clear beginning, middle, and end within {duration_in_seconds} seconds
     - Consider lighting and staging that would work well for stop-motion photography
     - Make it visually compelling for both children and adults
 
@@ -78,7 +78,7 @@ def generate_video_scene_descriptions(client: OpenAI, pdf_path: str, excluded_pa
     for page_index, story_text in pdf_page_index_to_text.items():
         if page_index in excluded_pages:
             continue
-        stop_motion_prompt = create_stop_motion_prompt(story_text, fps)
+        stop_motion_prompt = create_stop_motion_prompt(story_text, duration_in_seconds, fps)
         video_scene_description_response = request_gpt_text_response(client, stop_motion_prompt)
         video_scene_description = video_scene_description_response.output_text
         pdf_page_index_to_video_scene_description[page_index] = video_scene_description

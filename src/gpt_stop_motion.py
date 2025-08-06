@@ -9,7 +9,14 @@ def request_gpt_image(client: OpenAI, image_prompt: str) -> Response:
     created_image_response = client.responses.create(
         model = "gpt-4.1-mini",
         input = image_prompt,
-        tools = [{"type": "image_generation"}],
+        tools = [
+            {
+                "type": "image_generation",
+                "size": "1024x1024",
+                "quality": "high",
+                "background": "opaque"
+            }
+        ],
     )
     return created_image_response
 
@@ -21,7 +28,14 @@ def request_iterated_gpt_image(client: OpenAI, image_prompt: str, gpt_image_resp
         model = "gpt-4.1-mini",
         previous_response_id = gpt_image_response_id,
         input = image_prompt,
-        tools = [{"type": "image_generation"}],
+        tools = [
+            {
+                "type": "image_generation",
+                "size": "1024x1024",
+                "quality": "high",
+                "background": "opaque"
+            }
+        ],
     )
     return created_image_response
 
@@ -43,8 +57,7 @@ def get_stop_motion_frame_image_prompt(scene_description_prompt: str, duration_i
                                        fps: int, current_frame: int) -> str:
     prompt = f"""Please generate a stop motion image for frame {current_frame} that is one of a sequence of images for a stop motion
     video that is {duration_in_seconds} seconds long with {fps} frames per second. The prompt below is the overall scene description.
-    When iterating on previous images, do not change the background so that there is continuity between frames. Only change the image
-    to show movement of objects or characters as directed by the following prompt.
+    When iterating on previous images, focus on showing the movement described in the scene and keep image continuity high.
 
     {scene_description_prompt}
     """
@@ -69,7 +82,7 @@ def request_stop_motion_gpt_images(client: OpenAI, scene_description_prompt: str
 def save_images_from_gpt_image_responses(image_responses: list[Response], image_path_prefix: str) -> None:
     for index in range(0, len(image_responses)):
         image_path = f"{image_path_prefix}_FRAME_{index + 1}"
-        image_data = get_image_from_gpt_response(image_responses[0])
+        image_data = get_image_from_gpt_response(image_responses[index])
         save_image_from_gpt_image_data(image_path, image_data)
 
 
