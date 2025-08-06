@@ -13,6 +13,9 @@ STOP_MOTION_FPS = 6
 BOOK_PATH = r".\src\MinorMovementsGilbertoGuadiana.pdf"
 EXCLUDE_BOOK_PAGES = [0, 1]
 IMAGE_PATH_PREFIX = "MINOR_MOVEMENTS_STOP_MOTION"
+OUTPUT_DIRECTORY = "output"
+VIDEO_NAME = "MINOR_MOVEMENTS_STOP_MOTION_test.mp4"
+OUTPUT_VIDEO_PATH = f"{OUTPUT_DIRECTORY}\\{VIDEO_NAME}"
 
 def main():
     load_dotenv()
@@ -27,8 +30,9 @@ def main():
     for page_index, video_scene_descriptions in stop_motion_scene_descriptions.items():
         image_responses = gpt_stop_motion.request_stop_motion_gpt_images(openai_client, video_scene_descriptions,
                                                                          STOP_MOTION_DURATION_IN_SECONDS, STOP_MOTION_FPS)
-        image_path = f"{IMAGE_PATH_PREFIX}_PAGE_{page_index}.png"
-        gpt_stop_motion.save_images_from_gpt_image_responses(image_responses, image_path)
+        stop_motion_frame_path_prefix = f"{IMAGE_PATH_PREFIX}_PAGE_{page_index}"
+        gpt_stop_motion.save_stop_motion_frames_from_gpt_image_responses(image_responses, stop_motion_frame_path_prefix)
+    gpt_stop_motion.create_stop_motion_video_from_directory(OUTPUT_DIRECTORY, STOP_MOTION_FPS, OUTPUT_VIDEO_PATH)
 
 if __name__ == "__main__":
     main()

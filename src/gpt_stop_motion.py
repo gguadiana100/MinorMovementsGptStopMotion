@@ -4,6 +4,9 @@
 from openai import OpenAI
 from openai.types.responses import Response
 import base64
+import os
+import moviepy.video.io.ImageSequenceClip
+import re
 
 def request_gpt_image(client: OpenAI, image_prompt: str) -> Response:
     created_image_response = client.responses.create(
@@ -79,11 +82,22 @@ def request_stop_motion_gpt_images(client: OpenAI, scene_description_prompt: str
         image_responses.append(image_response)
     return image_responses
 
-def save_images_from_gpt_image_responses(image_responses: list[Response], image_path_prefix: str) -> None:
+def save_stop_motion_frames_from_gpt_image_responses(image_responses: list[Response], image_path_prefix: str) -> None:
     for index in range(0, len(image_responses)):
-        image_path = f"{image_path_prefix}_FRAME_{index + 1}"
+        image_path = f"{image_path_prefix}_FRAME_{index + 1}.png"
         image_data = get_image_from_gpt_response(image_responses[index])
         save_image_from_gpt_image_data(image_path, image_data)
 
+def page_and_frame_from_image_name(image_name: str) -> tuple[int, int]:
+    match = re.search(r"_(\d+)_(\d+).png", image_name)
+    page_number = int(match.group(1))
+    frame = int(match.group(2))
+    return (page_number, frame)
 
-
+# Adapted from https://stackoverflow.com/questions/44947505/how-to-make-a-movie-out-of-images-in-python
+def create_stop_motion_video_from_directory(image_directory: str, fps: int, video_path: str) -> None:
+    png_image_paths = [os.path.join(image_directory, image_name) for image_name in os.listdir(image_directory)
+                       if image_name.endswith(".png")]
+    sorted_frames = sorted(png_image_paths, key=page_and_frame_from_image_name)
+    stop_motion_video = moviepy.video.io.ImageSequenceClip.ImageSequenceClip(sorted_frames, fps=fps)
+    stop_motion_video.write_videofile(video_path)
