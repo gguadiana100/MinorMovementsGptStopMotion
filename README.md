@@ -29,6 +29,9 @@ python main.py
 
 It's about $0.20 per frame. For a 60 frames per story with 12 stories, it would be about $144. It's quite expensive!
 
+# Demo Reflections Blog Post
+https://www.linkedin.com/posts/gilberto-guadiana_smallleverslab-softwareengineering-openai-activity-7358936991356342272-5bZD 
+
 ## License
 
 MIT License
